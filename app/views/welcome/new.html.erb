@@ -1,0 +1,13 @@
+<h2>Are you human?<h2>
+<%= form_with(url: welcome_create_url, method: :post) do |form| %>
+  <%= form.label(:name, "Enter Your Name") %>
+  <%= form.text_field(:name) %>
+  <br />
+  <div
+    class="g-recaptcha"
+    data-controller="recaptcha"
+    data-sitekey="<%= Rails.application.credentials.dig(:recaptcha, :site_key) %>"
+  ></div>
+  <br />
+  <%= form.submit("Enter") %>
+<% end %>
