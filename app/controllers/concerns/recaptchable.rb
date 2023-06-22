@@ -5,11 +5,6 @@ module Recaptchable
   extend ActiveSupport::Concern
 
   RECAPTCHA_SITEVERIFY_URL = "https://www.google.com/recaptcha/api/siteverify".freeze
-  NET_HTTP_ERRORS = [
-    Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
-    Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
-    Errno::ECONNREFUSED, IOError, OpenSSL::SSL::SSLError
-  ]
 
   class ConfigurationError < StandardError
   end
@@ -17,7 +12,7 @@ module Recaptchable
   # Recaptcha siteverify API call
   # https://developers.google.com/recaptcha/docs/verify
   def recaptcha_valid?
-    client_token = params["g-recaptcha-response"]
+    client_token = params["g-recaptcha-response"] # top-level
     remoteip = request.remote_ip
 
     unless Rails.application.credentials.dig(:recaptcha, :secret_key).present?
@@ -45,9 +40,9 @@ module Recaptchable
       end
       return false
     end
-  rescue *NET_HTTP_ERRORS => e
+  rescue => e
     Rails.logger.error { e.message }
-    Rails.logger.error { e.backtrace.join("\n") }
+    Rails.logger.debug { e.backtrace.join("\n") }
     false
   end
 end
